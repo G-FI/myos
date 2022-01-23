@@ -29,12 +29,16 @@ void initialize_pmm(){
     frames = (uint32_t*)placement_address;
     placement_address += (nframes/8);
     memset(frames, 0, nframes/8); //nframes is number of bits
+
+    //set bit for frame already used
+    for(int i = 0; i < (uint32_t*)placement_address; i += FRAMESZ)
+        set_frame(i);
 }
 
 void alloc_frame(page_t *page, int is_kernel, int is_writeable){
     //return if frame was already allocated
     if(page->frame){
-        return;
+        PANIC("remap");
     }else{
         uint32_t idx = first_frame();
         if(idx == (uint32_t)-1){

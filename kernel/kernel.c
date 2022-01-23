@@ -15,6 +15,6 @@ void kernel_main(){
     asm volatile ("sti");
     init_timer(500);
     init_keyboard();
- //   initialize_pmm();
+    initialize_pmm();
     while(1);
 }
