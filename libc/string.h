@@ -9,4 +9,7 @@ void append(char *str, char c);
 void backspace(char *buf);
 void hex_to_ascii(int n, char *buf);
 
+void memcpy(char *src, char *dst, int sz);
+void memset(char *dst, char c, int sz);
+
 #endif //STRING_H_

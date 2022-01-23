@@ -61,3 +61,15 @@ void hex_to_ascii(int n, char *buf){
     }
     buf[idx] = 0;
 }
+
+//mem*
+void memcpy(char *src, char *dst, int sz){
+    for(int i = 0; i < sz; i++){
+        dst[i] = src[i];
+    }
+}
+
+void memset(char *dst, char c, int sz){
+    for(int i = 0; i < sz; i++)
+        dst[i] = c;
+}

@@ -1,7 +1,7 @@
 #include "isr.h"
 #include "ports.h"
 #include "../libc/string.h"
-#include "../drivers/screen.h"
+#include "../libc/printf.h"
 
 
 isr_t interrupt_handlers[256];
@@ -52,26 +52,22 @@ char *exception_messages[] = {
 
 
 void isr_handler(registers_t regs){
-    kprint("receive interrupt: ");
-    char buf[8];
-    int_to_ascii(regs.int_no, buf);
-    kprint(buf);
-    kprint(" -> ");
-    kprint(exception_messages[regs.int_no]);
-    kprint("\n");
+    printf("receive interrupt: %d -->%s\n", regs.int_no,
+                    exception_messages[regs.int_no]);
 }
 
 void irq_handler(registers_t regs){
    // Send an EOI (end of interrupt) signal to the PICs.
    // If this interrupt involved the slave.
-    if(regs.int_no >= 40) port_byte_out(0xA0, 0x20);
-  
-    port_byte_out(0x20, 0x20);
-   
-    kprint("in irq_handler\n");
-   if(interrupt_handlers[regs.int_no] != 0){
+
+    if(interrupt_handlers[regs.int_no] != 0){
         interrupt_handlers[regs.int_no](regs);
     }
+    if(regs.int_no >= 40) port_byte_out(0xA0, 0x20);
+  
+    kprint("in irq_handler\n");
+    port_byte_out(0x20, 0x20);
+   
 }
 
 

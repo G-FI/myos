@@ -1,7 +1,6 @@
 #include"screen.h"
 #include"../cpu/ports.h"
 #include "../libc/string.h"
-#include"../libc/mem.h"
 
 /*TODO use global variable instead ask vag port*/
 
@@ -85,7 +84,7 @@ int kprint_char(char c, int row, int col, char attr){
 int handle_screen(int offset){
     if(offset >= MAX_ROWS * MAX_COLS * 2){
         for(int row = 1; row < MAX_ROWS; row++){
-            mem_copy((char *)(VIDEO_ADDRESS + get_screen_offset(row, 0)),
+            memcpy((char *)(VIDEO_ADDRESS + get_screen_offset(row, 0)),
                     (char *)(VIDEO_ADDRESS + get_screen_offset(row - 1, 0)), MAX_COLS * 2);
         }
         char *last_line = (char *)get_screen_offset(MAX_ROWS - 1, 0) + VIDEO_ADDRESS;

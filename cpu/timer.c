@@ -1,17 +1,13 @@
 #include "timer.h"
 #include "isr.h"
 #include "../libc/string.h"
-#include "../drivers/screen.h"
+#include "../libc/printf.h"
 
 uint32_t ticks = 0;
 
 static void timer_callback(registers_t regs){
     ++ticks;
-    kprint("ticks:");
-    char buf[32];
-    int_to_ascii(ticks, buf);
-    kprint(buf);
-    kprint("\n");
+    printf("ticks: %d\n", ticks);
 }
 
 void init_timer(uint32_t freq){

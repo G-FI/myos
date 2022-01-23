@@ -1,10 +1,14 @@
 #include "paging.h"
 #include "kheap.h"
+#include "../libc/string.h"
 #include "../libc/printf.h"
 
 //bitmap for frames
 uint32_t *frames;
 uint32_t nframes;
+
+pagetable_dir_t *kernelpage_dir;
+pagetable_dir_t *currentpage_dir;
 
 //helper function
 #define INDEX_FROM_BIT(fa) (fa/(8 * 4))
@@ -22,7 +26,11 @@ void initialize_paging(){
     nframes = mem_end_page/0x1000;
     frames = (uint32_t*)kmalloc(INDEX_FROM_BIT(nframes));
 
-    //TODO memset
+    memset((char *)frames, 0, INDEX_FROM_BIT(nframes) * 4);
+
+    kernelpage_dir = (pagetable_dir_t*)kmalloc(sizeof(pagetable_dir_t));
+
+    
 
 }
 
@@ -39,18 +47,18 @@ static void clear_frame(uint32_t fa){
     uint32_t off = OFFSET_FROM_BIT(frame);
     frames[idx] &= ~(0x01 << off);
 }
-static void test_frame(uint32_t fa){
+static uint32_t test_frame(uint32_t fa){
     uint32_t frame = fa/0x1000;
     uint32_t idx = INDEX_FROM_BIT(frame);
     uint32_t off = OFFSET_FROM_BIT(frame);
-    return (frams[idx] & (0x01 << off));
+    return (frames[idx] & (0x01 << off));
 }
 
-static uint32_t frist_frame(){
-    for(uint32_t i = 0; i < INDEX_FROM_BIT(nframs); i++){
-        if(frams[i]  != 0xFFFFFFFF){
+static uint32_t first_frame(){
+    for(uint32_t i = 0; i < INDEX_FROM_BIT(nframes); i++){
+        if(frames[i]  != 0xFFFFFFFF){
             for(uint32_t j = 0; j < 32; j++){
-                if((frams[i] & (0x01 << j)) == 0){
+                if((frames[i] & (0x01 << j)) == 0){
                     return i * 32 + j;
                 }
             }
@@ -77,7 +85,7 @@ static void alloc_frame(page_t *page, int is_kernel, int is_writeable){
 }
 
 static void free_frame(page_t *page){
-    if(page->fame == 0){
+    if(page->frame == 0){
         return;
     }else{
         clear_frame(page->frame);

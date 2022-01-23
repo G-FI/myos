@@ -7,7 +7,7 @@
 #define ENTRIES 1024
 
 //page
-typedef strcut {
+typedef struct{
     uint32_t present    :1;
     uint32_t rw         :1;
     uint32_t user       :1;
@@ -16,6 +16,7 @@ typedef strcut {
     uint32_t unused     :7;
     uint32_t frame      :20;
 }page_t;
+
 
 //pagetable
 typedef struct{
@@ -37,7 +38,7 @@ void initialize_paging();
 
 void switch_page_dir(pagetable_dir_t *new_dir);
 
-pte_t *get_page(uint32_t pa, int make, pagetable_dir_t *dir);
+page_t *get_page(uint32_t pa, int make, pagetable_dir_t *dir);
 
 void page_fault(registers_t *regs);
 
