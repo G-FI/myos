@@ -1,5 +1,5 @@
-#ifndef PAGING_H_
-#define PAGING_H_
+#ifndef VMM_H_
+#define VMM_H_
 
 #include <stdint.h>
 #include "../cpu/isr.h"
@@ -46,4 +46,4 @@ void page_fault(registers_t *regs);
 
 
 
-#endif //PAGING_H_
+#endif //VMM_H_

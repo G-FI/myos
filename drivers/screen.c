@@ -84,8 +84,8 @@ int kprint_char(char c, int row, int col, char attr){
 int handle_screen(int offset){
     if(offset >= MAX_ROWS * MAX_COLS * 2){
         for(int row = 1; row < MAX_ROWS; row++){
-            memcpy((char *)(VIDEO_ADDRESS + get_screen_offset(row, 0)),
-                    (char *)(VIDEO_ADDRESS + get_screen_offset(row - 1, 0)), MAX_COLS * 2);
+            memcpy((void*)(VIDEO_ADDRESS + get_screen_offset(row - 1, 0)),
+            (void*)(VIDEO_ADDRESS + get_screen_offset(row, 0)), MAX_COLS * 2);
         }
         char *last_line = (char *)get_screen_offset(MAX_ROWS - 1, 0) + VIDEO_ADDRESS;
         for(int i =0 ; i < MAX_COLS * 2; i++){

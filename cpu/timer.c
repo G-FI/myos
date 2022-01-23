@@ -1,13 +1,17 @@
 #include "timer.h"
 #include "isr.h"
+#include "ports.h"
 #include "../libc/string.h"
 #include "../libc/printf.h"
+#include "../libc/function.h"
 
 uint32_t ticks = 0;
 
-static void timer_callback(registers_t regs){
+void timer_callback(registers_t regs){
     ++ticks;
-    printf("ticks: %d\n", ticks);
+    UNUSED(regs);
+    //printf("ticks: %d\n", ticks);
+    
 }
 
 void init_timer(uint32_t freq){

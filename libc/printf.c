@@ -69,8 +69,8 @@ void printf(char *fmt, ...){
     va_end(ap);
 }
 
-void panic(char * msg, char *file, char *line){
-    printf("%s: %s\n", file, line);
+void panic(char * msg, char *file, int line){
+    printf("%s: %d\n", file, line);
     printf("panic: %s\n", msg);
     for(;;);
 }

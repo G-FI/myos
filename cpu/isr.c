@@ -59,13 +59,12 @@ void isr_handler(registers_t regs){
 void irq_handler(registers_t regs){
    // Send an EOI (end of interrupt) signal to the PICs.
    // If this interrupt involved the slave.
-
     if(interrupt_handlers[regs.int_no] != 0){
         interrupt_handlers[regs.int_no](regs);
     }
     if(regs.int_no >= 40) port_byte_out(0xA0, 0x20);
   
-    kprint("in irq_handler\n");
+
     port_byte_out(0x20, 0x20);
    
 }

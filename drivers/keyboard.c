@@ -29,13 +29,13 @@ void kerboard_callback(){
     uint8_t scancode = port_byte_in(0x60);
     if(scancode > SC_MAX) return;
     if(scancode == BACKSPACE){
-        if(strlen(input_buf) != 0){
-            kprint_backspace();
-            backspace(input_buf);
-        }
+        kprint_backspace();
+        // if(strlen(input_buf) != 0){
+        //     kprint_backspace();
+        //     backspace(input_buf);
+        // }
     }else if(scancode == ENTER){
         kprint("\n");
-        user_input(input_buf);
         input_buf[0] = 0;
     }else{
         char c = sc_ascii[scancode];

@@ -22,13 +22,13 @@ void reverse(char *str){
     }
 }
 
-int strlen(char *str){
+int strlen(const char *str){
     int n = 0;
     while(str[n] != 0) ++n;
     return n;
 }
 
-int strcmp(char *s1, char *s2){
+int strcmp(const char *s1, const char *s2){
     int i;
     for(i = 0; s1[i] == s2[i]; i++){
         if(s1[i] == 0) return 0;
@@ -63,13 +63,26 @@ void hex_to_ascii(int n, char *buf){
 }
 
 //mem*
-void memcpy(char *src, char *dst, int sz){
-    for(int i = 0; i < sz; i++){
-        dst[i] = src[i];
-    }
+void* memcpy(void *dst, const void *src, uint32_t sz){
+    char *s, *d;
+    s = src;
+    d = dst;
+    if(s < d && s + sz > d){
+    //overlap
+        s += sz;
+        d += sz;
+        while(sz-- > 0){
+            *--d = *--s; 
+        }
+    }else
+        while(sz-- > 0)
+            *d++ = *s++;
+    return dst;
 }
 
-void memset(char *dst, char c, int sz){
+void* memset(void *dst, int c, uint32_t sz){
+    char *cdst = (char *)dst;
     for(int i = 0; i < sz; i++)
-        dst[i] = c;
+        cdst[i] = c;
+    return dst;
 }

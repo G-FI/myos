@@ -12,10 +12,10 @@ run: myos.iso
 debug: myos.iso
 	qemu-system-i386 -S -s -curses -cdrom $<
 
-myos.iso:isodir myos.bin
+myos.iso:isodir myos.elf
 	grub-mkrescue -o $@ $<
 
-myos.bin:linker.ld  ${OBJ}
+myos.elf:linker.ld  ${OBJ}
 	i386-elf-gcc -T ./linker.ld -o isodir/boot/$@ -ffreestanding $^ -nostdlib 
 
 
@@ -31,5 +31,5 @@ myos.bin:linker.ld  ${OBJ}
 
 clean:
 	rm -rf  boot/*.o cpu/*.o drivers/*.o kernel/*.o libc/*.o
-	rm isodir/boot/*.bin
+	rm isodir/boot/*.elf
 	rm *.iso

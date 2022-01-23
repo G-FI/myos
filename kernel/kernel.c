@@ -6,16 +6,15 @@
 #include "../cpu/timer.h"
 #include "../drivers/keyboard.h"
 #include "../libc/printf.h"
+#include "pmm.h"
+
 
 void kernel_main(){
     init_descriptor_tables();
 
     asm volatile ("sti");
-    init_timer(5);
+    init_timer(500);
     init_keyboard();
-
-    asm volatile("int $32");
-    asm volatile("int $32");
-    asm volatile("int $32");
-    asm volatile("int $32");
+ //   initialize_pmm();
+    while(1);
 }
