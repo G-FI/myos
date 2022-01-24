@@ -52,8 +52,11 @@ char *exception_messages[] = {
 
 
 void isr_handler(registers_t regs){
-    printf("receive interrupt: %d -->%s\n", regs.int_no,
-                    exception_messages[regs.int_no]);
+    if(interrupt_handlers[regs.int_no]){
+        interrupt_handlers[regs.int_no](regs);
+    }else{
+        printf("unhandled exception: %s\n", exception_messages[regs.int_no]);
+    }
 }
 
 void irq_handler(registers_t regs){
@@ -61,10 +64,11 @@ void irq_handler(registers_t regs){
    // If this interrupt involved the slave.
     if(interrupt_handlers[regs.int_no] != 0){
         interrupt_handlers[regs.int_no](regs);
+    }else{
+        printf("unhandled interrupt: %d\n", regs.int_no);
     }
     if(regs.int_no >= 40) port_byte_out(0xA0, 0x20);
   
-
     port_byte_out(0x20, 0x20);
    
 }

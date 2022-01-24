@@ -6,7 +6,7 @@
 #include "../cpu/timer.h"
 #include "../drivers/keyboard.h"
 #include "../libc/printf.h"
-#include "pmm.h"
+#include "vmm.h"
 
 
 void kernel_main(){
@@ -15,6 +15,10 @@ void kernel_main(){
     asm volatile ("sti");
     init_timer(500);
     init_keyboard();
-    initialize_pmm();
+    initialize_paging();
+    char *ptr = 0x10e000;
+    char a = *ptr;
+
     while(1);
 }
+

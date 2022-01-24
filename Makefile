@@ -6,14 +6,16 @@ OBJ = ${C_SOURCES:.c=.o boot/boot.o cpu/interrupt.o cpu/tables_flush.o}
 
 CFLAGS = -g -std=gnu99 -ffreestanding -Wall -Wextra
 
+myos.iso:isodir myos.elf
+	grub-mkrescue -o $@ $<
+
 run: myos.iso
 	qemu-system-i386  -nographic -curses -cdrom  $<
 
 debug: myos.iso
 	qemu-system-i386 -S -s -curses -cdrom $<
 
-myos.iso:isodir myos.elf
-	grub-mkrescue -o $@ $<
+
 
 myos.elf:linker.ld  ${OBJ}
 	i386-elf-gcc -T ./linker.ld -o isodir/boot/$@ -ffreestanding $^ -nostdlib 

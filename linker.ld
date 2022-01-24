@@ -66,5 +66,5 @@ SECTIONS
         . = ALIGN(4096);
     }
 
-    end = .; _end = .; __end = .;
+    PROVIDE(end = .); _end = .; __end = .;
 }

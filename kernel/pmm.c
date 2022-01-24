@@ -1,43 +1,26 @@
 #include "pmm.h"
 #include "vmm.h"
+#include "kheap.h"
 #include "../libc/string.h"
 #include "../libc/printf.h"
 
-//Macro for pmm
-#define FRAMESZ 0x1000
-#define MEM_END 0x1000000   //the size of physical address 16Mib
-
-//defined in linker.ld
-extern uint32_t end;
-
 //bitmap for frames
-uint32_t *frames;
+char *frames;
 uint32_t nframes;
-uint32_t placement_address = (uint32_t)&end;
 
 //helper function
-#define INDEX_FROM_BIT(fa) (fa/(8 * 4))
-#define OFFSET_FROM_BIT(fa) (fa%(8 * 4))
+#define INDEX_FROM_BIT(fa) (fa/ 8)
+#define OFFSET_FROM_BIT(fa) (fa% 8)
 static void set_frame(uint32_t fa);
 static void clear_frame(uint32_t fa);
 static uint32_t test_frame(uint32_t fa);
 static uint32_t first_frame();
 
+
 //public API
-void initialize_pmm(){
-    nframes = MEM_END/FRAMESZ;
-    frames = (uint32_t*)placement_address;
-    placement_address += (nframes/8);
-    memset(frames, 0, nframes/8); //nframes is number of bits
-
-    //set bit for frame already used
-    for(int i = 0; i < (uint32_t*)placement_address; i += FRAMESZ)
-        set_frame(i);
-}
-
-void alloc_frame(page_t *page, int is_kernel, int is_writeable){
+void alloc_frame(pte_t *pte, int is_kernel, int is_writeable){
     //return if frame was already allocated
-    if(page->frame){
+    if(pte->frame){
         PANIC("remap");
     }else{
         uint32_t idx = first_frame();
@@ -45,19 +28,19 @@ void alloc_frame(page_t *page, int is_kernel, int is_writeable){
             PANIC("alloc_frame" );
         }
         set_frame(idx * 0x1000);
-        page->present = 1; // Mark it as present.
-        page->rw = (is_writeable)?1:0; // Should the page be writeable?
-        page->user = (is_kernel)?0:1; // Should the page be user-mode?
-        page->frame = idx;
+        pte->present = 1; // Mark it as present.
+        pte->rw = (is_writeable)?1:0; // Should the page be writeable?
+        pte->user = (is_kernel)?0:1; // Should the page be user-mode?
+        pte->frame = idx;
     }
 }
 
-void free_frame(page_t *page){
-    if(page->frame == 0){
-        return;
+void free_frame(pte_t *pte){
+    if(pte->frame == 0){
+        PANIC("free_frame");
     }else{
-        clear_frame(page->frame);
-        page->frame = 0;
+        clear_frame(pte->frame);
+        pte->frame = 0;
     }
 }
 
@@ -84,9 +67,9 @@ static uint32_t test_frame(uint32_t fa){
 static uint32_t first_frame(){
     for(uint32_t i = 0; i < INDEX_FROM_BIT(nframes); i++){
         if(frames[i]  != 0xFFFFFFFF){
-            for(uint32_t j = 0; j < 32; j++){
+            for(uint32_t j = 0; j < 8; j++){
                 if((frames[i] & (0x01 << j)) == 0){
-                    return i * 32 + j;
+                    return i * 8 + j;
                 }
             }
         }
