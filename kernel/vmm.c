@@ -11,6 +11,7 @@ extern uint32_t placement_address;
 pagetable_dir_t *kernel_dir;
 pagetable_dir_t *cur_dir;
 
+extern heap_t *kheap;
 
 
 void initialize_paging(){
@@ -25,17 +26,31 @@ void initialize_paging(){
 
     memset(kernel_dir, 0, sizeof(pagetable_dir_t));
 
+    //map kheap to kernel_dir, but don't allocate frame, in order to 
+    //direct map of first kernelpagetable,
+    //then the heap frame is palced after kernel data struct(page table)
+    for(uint32_t i = KHEAP_START; i < KHEAP_START + KHEAP_INITIAL_SIZE; i += FRAMESZ)
+        get_pte(i, 1, kernel_dir);
+
     uint32_t pa = 0;
-    while(pa < placement_address){
+    //add one frame for kernel heap_t struct, which will 
+    //be allocated in creat heap, after that placement_address
+    //will be invalid
+    while(pa < placement_address + FRAMESZ){
         //get_page return pte of a table, and alloc_frame map it to a frame
         alloc_frame(get_pte(pa, 1, kernel_dir), 0, 0);
         pa += FRAMESZ;
     }
 
+     for(uint32_t i = KHEAP_START; i < KHEAP_START + KHEAP_INITIAL_SIZE; i += FRAMESZ)
+        alloc_frame(get_pte(i, 1, kernel_dir), 0, 1);
+
     registe_interrupt_handler(14, page_fault);
 
     //enable page
     switch_page_dir(kernel_dir);
+
+    kheap = create_heap(KHEAP_START, KHEAP_START + KHEAP_INITIAL_SIZE, KHEAP_MAX_ADDR, 0, 1);
 }
 
 void switch_page_dir(pagetable_dir_t *new_dir){

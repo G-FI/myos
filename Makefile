@@ -13,7 +13,7 @@ run: myos.iso
 	qemu-system-i386  -nographic -curses -cdrom  $<
 
 debug: myos.iso
-	qemu-system-i386 -S -s -curses -cdrom $<
+	qemu-system-i386 -S -s -nographic -curses -cdrom $<
 
 
 

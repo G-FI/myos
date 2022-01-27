@@ -6,3 +6,7 @@
     ``` char *ptr = 0x10e000;
         char a = *ptr;
 6. TODO: pagetable_dir->tables可以不要，因为tables只是为了直接找到页表，但页表也可以通过判断dir的present再用高20位地址访问到页表
+7. TODO: test algorithm for ordered_array_t
+8. TODO: 删除hole，或者增大减小hole的时候如何调整位置呢? solution: 根据*header_t在有序数组中找到该header对应的索引，然后remove或者increase或decrease
+9. TODO: extract 中如何减小空间，如何处理header 在边界里面， 但footer在边界外面
+10. TODO：删除kheap中的测试函数接口
