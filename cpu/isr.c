@@ -51,6 +51,7 @@ char *exception_messages[] = {
 };
 
 
+//cpu产生异常处理程序dispatch
 void isr_handler(registers_t regs){
     if(interrupt_handlers[regs.int_no]){
         interrupt_handlers[regs.int_no](regs);
@@ -59,6 +60,7 @@ void isr_handler(registers_t regs){
     }
 }
 
+//中断处理程序dispath，根据出错的interrupt_number来查找中断处理程序，并执行
 void irq_handler(registers_t regs){
    // Send an EOI (end of interrupt) signal to the PICs.
    // If this interrupt involved the slave.

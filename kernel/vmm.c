@@ -26,16 +26,14 @@ void initialize_paging(){
 
     memset(kernel_dir, 0, sizeof(pagetable_dir_t));
 
-    //map kheap to kernel_dir, but don't allocate frame, in order to 
-    //direct map of first kernelpagetable,
-    //then the heap frame is palced after kernel data struct(page table)
+    //先分配kheap的页表，但是不分配空间，只是分配页表
     for(uint32_t i = KHEAP_START; i < KHEAP_START + KHEAP_INITIAL_SIZE; i += FRAMESZ)
         get_pte(i, 1, kernel_dir);
 
     uint32_t pa = 0;
-    //add one frame for kernel heap_t struct, which will 
-    //be allocated in creat heap, after that placement_address
-    //will be invalid
+    
+    //映射从零开始到heap_t数据结构的内存，作为直接映射，也就是分页情况下在heap_t数据结构以下的内存，虚拟地址==物理地址
+    //并且初始化frame管理器
     while(pa < placement_address + FRAMESZ){
         //get_page return pte of a table, and alloc_frame map it to a frame
         alloc_frame(get_pte(pa, 1, kernel_dir), 0, 0);
@@ -49,6 +47,8 @@ void initialize_paging(){
 
     //enable page
     switch_page_dir(kernel_dir);
+    //在kheap创建之前使用的物理空间都是placement_address，进行分配，
+    //堆区空间分配在了页表直接上去的地址处，但是虚拟地址却在KHEAP_START那里
 
     kheap = create_heap(KHEAP_START, KHEAP_START + KHEAP_INITIAL_SIZE, KHEAP_MAX_ADDR, 0, 1);
 }
@@ -64,8 +64,10 @@ void switch_page_dir(pagetable_dir_t *new_dir){
     printf("swich_page ok\n");
 }
 
-pte_t *get_pte(uint32_t pa, int make, pagetable_dir_t *dir){
-    uint32_t frame = (pa>>12);
+//只是得到va对应的page_table的pte，如果那个teable存在的话，pte要么也存在，要么不存在
+//当不存在时就是要去alloc_frame，get_pte只负责得到那个pte，而不管哪个pte是否有对应的frame
+pte_t *get_pte(uint32_t va, int make, pagetable_dir_t *dir){
+    uint32_t frame = (va>>12);
     uint32_t table_idx = frame / 1024;
     uint32_t pte_idx = frame % 1024;
     if(dir->tables[table_idx]){

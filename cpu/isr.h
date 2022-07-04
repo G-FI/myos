@@ -21,6 +21,7 @@
 #define IRQ14 46
 #define IRQ15 47
 
+/* 异常，中断处理时保存的寄存器状态，以及出错信息*/
 /* Struct which aggregates many registers */
 typedef struct {
    uint32_t ds; /* Data segment selector */

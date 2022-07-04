@@ -24,7 +24,7 @@ uint32_t kmalloc(uint32_t sz){
 uint32_t kmalloc_a(uint32_t sz){
     return kheap_aux(sz, 1, 0);
 }
-uint32_t kmalloc_ap(uint32_t sz, uint32_t *pa){
+uint32_t  kmalloc_ap(uint32_t sz, uint32_t *pa){
     return kheap_aux(sz, 1, pa);
 }
 uint32_t kmalloc_p(uint32_t sz, uint32_t *pa){
@@ -80,7 +80,7 @@ heap_t* create_heap(uint32_t start, uint32_t end, uint32_t max, int supervisor, 
     //address start 
     heap->headers_ptr = place_ordered_array((void*)start, KHEAP_INDEX_SIZE, less_than);
     
-    //kheap space start after heap->array
+    //kheap space start after heap->array, start = 0xC0008000
     start += KHEAP_INDEX_SIZE * sizeof(type_t);
 
     //kheap 4kib align
@@ -106,33 +106,35 @@ heap_t* create_heap(uint32_t start, uint32_t end, uint32_t max, int supervisor, 
     footer->magic = MAGIC;
     
     insert(header, &heap->headers_ptr);
+    return heap;
 }
 
 void* alloc(uint32_t sz, int aligned, heap_t *heap){
     uint32_t idx = find_smallest_hole(sz, aligned, heap);
-    if(idx == (uint32_t)-1){ //no fitted hole
+    //没有找到合适大小的hole
+    if(idx == (uint32_t)-1){ 
         uint32_t newsz = heap->end_addr - heap->start_addr + sz + sizeof(header_t) + sizeof(footer_t);
         expand(newsz, heap);
         return alloc(sz, aligned, heap);
     }
     //found the fitted hole
-
     header_t *header = (header_t*)heap->headers_ptr.array[idx];
     footer_t *footer = FOOTER(header);
     uint32_t oldsz = header->size;
-    //remove origin hole
+    //既然找到了能用的hole，一定要从可使用headers中先删除
     idx = find(header, &kheap->headers_ptr);
     remove(idx, &kheap->headers_ptr);
+
     if(aligned){
-        //check if spilt or splic space ahead of aligned point
         uint32_t offset = FRAMESZ - (uint32_t)header%FRAMESZ - sizeof(header_t);  //offset = distance between header to new_header
         header_t *new_header = (header_t*)((uint32_t)header + offset);
 
         if(offset > sizeof(header_t) + sizeof(footer_t)){
-            //enough space to create a hole
+            //header到对齐点之间有空间可以用，足够分成一个单独的hole
             create_hole((uint32_t)header, (uint32_t)new_header, kheap);
         
-        }else{//splic to previous hole
+        }else{
+            //不够，就需要合并到前一个hole或者block（不管它是不是空闲，因为要保证堆区是全部连接的）
             header_t *pre_header = PREHEADER(header);
             //add_space = offset
             pre_header->size += offset;
@@ -141,8 +143,13 @@ void* alloc(uint32_t sz, int aligned, heap_t *heap){
             pre_footer->magic = MAGIC;
             pre_footer->header = pre_footer;
             //remove origin hole, create new hole insert to ordered_array and increase the key of previous block
-            idx = find(pre_header, &kheap->headers_ptr);
-            increase_key(idx, &kheap->headers_ptr);
+            // idx = find(pre_header, &kheap->headers_ptr);
+            // increase_key(idx, &kheap->headers_ptr);
+            //如果左边是一个hole，就需要调整有序数组
+            if(pre_header->is_hole){
+                idx = find(pre_header, &kheap->headers_ptr);
+                increase_key(idx, kheap->headers_ptr)
+            }
             
         }
         //adjust remaining space 
@@ -152,8 +159,7 @@ void* alloc(uint32_t sz, int aligned, heap_t *heap){
         //left previous footer->header point to the new header
         footer->header = header;
     }
-    
-    //allocate begin with right of header
+    //现在满足，分配成功，并且左边已经调整好，[header, footer), 剩下的就是右边，是否需要再拆分
     
     //check if split a new hole on the right
     if(sz + 2*(sizeof(header_t) + sizeof(footer_t)) < header->size){
@@ -166,7 +172,8 @@ void* alloc(uint32_t sz, int aligned, heap_t *heap){
         footer->magic = MAGIC;
         footer->header = header;
     }
-    insert(header, &heap->headers_ptr);
+    //应该
+    //insert(header, &heap->headers_ptr);
 
     header->is_hole = 0;
     return (void*) header + sizeof(header_t);
@@ -186,8 +193,9 @@ int find_smallest_hole(uint32_t sz, int aligned, heap_t *heap){
     uint32_t i;
     for(i = 0; i < heap->headers_ptr.size; i++){
         header = (header_t*)(heap->headers_ptr.array[i]);
-        if(!header->is_hole|| sz + sizeof(header_t) + sizeof(footer_t) > header ->size)
+        if(sz + sizeof(header_t) + sizeof(footer_t) > header ->size)
             continue;
+        //大小够用
         if(aligned){
             int offset = FRAMESZ - ((uint32_t)header) & 0xFFF;
             if(offset + sz + sizeof(footer_t) < header->size){
@@ -224,9 +232,9 @@ void expand(uint32_t newsz, heap_t *heap){
     contract((header_t*)old_end, heap);
 }
 
-//TODO: remove from ordered_array
+//TODO: remove from ordered_array, 
 void extract(uint32_t newsz, heap_t *heap){
-    //assert(heap->start_addr< heap->start_addr+newsz < heap->end_addr)
+    //assert(heap->start_addr< heap->staexrt_addr+newsz < heap->end_addr)
     if(newsz < KHEAP_MIN_SIZE)
         return;
     
@@ -253,8 +261,8 @@ void create_hole(uint32_t start_addr, uint32_t end_addr, heap_t *heap){
     insert(header, heap);
 }
 
-//TODO: insert and remove from ordered_array
 //unify left or right, if it is a hole 
+//传入的header：还没有被插入回ordered_array
 void contract(header_t *h, heap_t *heap){
 
     header_t *header = h;
@@ -286,16 +294,15 @@ void contract(header_t *h, heap_t *heap){
             //unify left
             header->size += h->size;
             footer->header = header;
-            //remove present block
-            uint32_t idx = find(h, &heap->headers_ptr);
-            remove(idx, &heap->headers_ptr);
-            //increase size of previous block
-            idx = find(header, &heap->headers_ptr);
+
+            //如果左边可以合并，因为当前hole还没有插入到数组中，所以直接给左边的hole增加大小，然后increase_key
+            uint32_t idx = find(header, &heap->headers_ptr);
             increase_key(idx, &heap->headers_ptr);
             return;
         }
     }
-    //maybe next block concatnate to present block
+
+    //对于只合并右边的情况
     uint32_t idx = find(h, &heap->headers_ptr);
     increase_key(idx, &heap->headers_ptr);
     

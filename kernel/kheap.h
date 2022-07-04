@@ -32,7 +32,7 @@ typedef struct{
 }footer_t;
 
 typedef struct{
-    ordered_array_t headers_ptr;
+    ordered_array_t headers_ptr; //空闲的hole的有序数组，当一个hole被使用时就要从这个里面remove，当创建hole时需要insert
     uint32_t start_addr;
     uint32_t end_addr;
     uint32_t max_addr;
@@ -45,7 +45,7 @@ heap_t* create_heap(uint32_t start, uint32_t end, uint32_t max, int supervisor, 
 void* alloc(uint32_t sz, int aligned, heap_t *heap);
 void* free(void *p, heap_t *heap);
 
-//test
+
 int find_smallest_hole(uint32_t sz, int aligned, heap_t *heap);
 void expand(uint32_t newsz, heap_t *heap);
 void extract(uint32_t newsz, heap_t *heap);

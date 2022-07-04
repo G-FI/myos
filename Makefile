@@ -10,17 +10,16 @@ myos.iso:isodir myos.elf
 	grub-mkrescue -o $@ $<
 
 run: myos.iso
-	qemu-system-i386  -nographic -curses -cdrom  $<
+	qemu-system-i386  -cdrom  $<
+	#qemu-system-i386  -nographic -curses -cdrom  $<
 
 debug: myos.iso
-	qemu-system-i386 -S -s -nographic -curses -cdrom $<
+	qemu-system-i386 -S -s -cdrom $<
 
 
 
 myos.elf:linker.ld  ${OBJ}
 	i386-elf-gcc -T ./linker.ld -o isodir/boot/$@ -ffreestanding $^ -nostdlib 
-
-
 
 
 #编译成目标文件

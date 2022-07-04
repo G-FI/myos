@@ -1,0 +1,24 @@
+{
+    "files.associations": {
+        "isr.h": "c",
+        "pmm.h": "c",
+        "vmm.h": "c",
+        "stdint.h": "c",
+        "printf.h": "c",
+        "string.h": "c",
+        "kheap.h": "c",
+        "ordered_array.h": "c",
+        "stdarg.h": "c",
+        "ports.h": "c",
+        "timer.h": "c",
+        "function.h": "c",
+        "*.tcc": "c",
+        "bitset": "c",
+        "unordered_map": "c",
+        "iomanip": "c",
+        "istream": "c",
+        "functional": "c",
+        "utility": "c"
+    },
+    "C_Cpp.errorSquiggles": "Disabled"
+}

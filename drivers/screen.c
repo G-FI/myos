@@ -117,6 +117,7 @@ int get_cursor_offset(){
     return offset  * 2; //keep in mind *2
 }
 
+//硬件游标是输入字符时的提示短杠
 void set_cursor_offset(int offset){
     offset /= 2;
     port_byte_out(REG_SCREEN_CTRL, 14);

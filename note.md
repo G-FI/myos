@@ -10,3 +10,22 @@
 8. TODO: 删除hole，或者增大减小hole的时候如何调整位置呢? solution: 根据*header_t在有序数组中找到该header对应的索引，然后remove或者increase或decrease
 9. TODO: extract 中如何减小空间，如何处理header 在边界里面， 但footer在边界外面
 10. TODO：删除kheap中的测试函数接口
+
+11. 交叉编译gcc时的选项 --without-headers tells GCC not to rely on any C library (standard or runtime) being present for the target.
+
+# 分页
+```rust
+page fault cpu会push一个err code，其中的位表示出错类型
+出错地址保存在CR2寄存器中
+Bit 0
+    If set, 这个page是存在的，否则是page不存在
+Bit 1
+    If set, the operation that caused the fault was a write, else it was a read.
+Bit 2
+    If set, the processor was running in user-mode when it was interrupted. Else, it was running in kernel-mode.
+Bit 3
+    If set, the fault was caused by reserved bits being overwritten.
+Bit 4
+    If set, the fault occurred during an instruction fetch.
+
+```

@@ -25,9 +25,11 @@ typedef struct{
 
 //pagetable directory: sizeof(pagetable_dir_t) = 4096 + 4096 + 4 = 8196 bytes, take 3 physical frames
 typedef struct{
+    //table
     pagetable_t *tables[ENTRIES];
     
     //array of pointers to physical addr of tables
+    //当clonetable时用的上
     uint32_t table_physical[ENTRIES];
 
     uint32_t physical_addr;
