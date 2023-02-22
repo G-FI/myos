@@ -4,7 +4,9 @@
                 "label": "Launch QEMU",
                 "type": "shell",
                 "linux":{
-                    "command": "qemu-system-i386 -S -s -nographic -curses -cdrom myos.iso "
+                    //"command": "qemu-system-i386 -S -s -nographic -curses -cdrom myos.iso "
+                    "command": "qemu-system-i386 -S -s -kernel isodir/boot/myos.elf "
+
                 }
             }
     ],

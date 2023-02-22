@@ -148,7 +148,7 @@ void* alloc(uint32_t sz, int aligned, heap_t *heap){
             //如果左边是一个hole，就需要调整有序数组
             if(pre_header->is_hole){
                 idx = find(pre_header, &kheap->headers_ptr);
-                increase_key(idx, kheap->headers_ptr)
+                increase_key(idx, &kheap->headers_ptr);
             }
             
         }

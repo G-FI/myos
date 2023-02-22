@@ -116,7 +116,7 @@ void init_idt(){
     idt_ptr.limit = sizeof(idt_entries) * 256 - 1;
     idt_ptr.base = (uint32_t)&idt_entries;
 
-        // Remap the PIC 
+    // Remap the PIC 
     port_byte_out(0x20, 0x11);
     port_byte_out(0xA0, 0x11);
     port_byte_out(0x21, 0x20);

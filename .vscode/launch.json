@@ -16,8 +16,7 @@
             "remote": true,
             "cwd": "${workspaceRoot}", 
             "gdbpath": "/usr/bin/gdb",
-            
-           // "preLaunchTask" : "Launch QEMU"
+            //"preLaunchTask" : "Launch QEMU"
            
         }
         

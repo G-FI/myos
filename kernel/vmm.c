@@ -25,7 +25,7 @@ void initialize_paging(){
     kernel_dir = (pagetable_dir_t *)kmalloc_ap(sizeof(pagetable_dir_t), &kernel_dir_addr);
 
     memset(kernel_dir, 0, sizeof(pagetable_dir_t));
-
+    cur_dir = kernel_dir;
     //先分配kheap的页表，但是不分配空间，只是分配页表
     for(uint32_t i = KHEAP_START; i < KHEAP_START + KHEAP_INITIAL_SIZE; i += FRAMESZ)
         get_pte(i, 1, kernel_dir);

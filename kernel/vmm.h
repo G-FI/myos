@@ -36,10 +36,13 @@ typedef struct{
 
 }pagetable_dir_t;
 
+//设置环境，页表，开启分页
 void initialize_paging();
 
+//将新的页目录加载到CR3寄存器
 void switch_page_dir(pagetable_dir_t *new_dir);
 
+//根据虚拟地址获取对应的页表项pte，若make设置为1，若第二级页表不存在则创建T
 pte_t *get_pte(uint32_t pa, int make, pagetable_dir_t *dir);
 
 void page_fault(registers_t regs);

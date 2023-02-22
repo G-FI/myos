@@ -46,8 +46,6 @@ void kernel_main(){
     init_keyboard();
     initialize_paging();
     
-   // test_find_hole(); 
-   test_heap_alloc();
 
     while(1);
 }

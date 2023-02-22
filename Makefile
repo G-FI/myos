@@ -6,25 +6,24 @@ OBJ = ${C_SOURCES:.c=.o boot/boot.o cpu/interrupt.o cpu/tables_flush.o}
 
 CFLAGS = -g -std=gnu99 -ffreestanding -Wall -Wextra
 
-myos.iso:isodir myos.elf
-	grub-mkrescue -o $@ $<
+complier=i686-elf-gcc
 
-run: myos.iso
-	qemu-system-i386  -cdrom  $<
-	#qemu-system-i386  -nographic -curses -cdrom  $<
+##直接从内核文件启动，而不需要启动介质cdrom
+run: myos.elf
+	qemu-system-i386 -kernel isodir/boot/$<
 
-debug: myos.iso
-	qemu-system-i386 -S -s -cdrom $<
+debug: myos.elf
+	qemu-system-i386 -S -s -kernel isodir/boot/$<
 
 
 
 myos.elf:linker.ld  ${OBJ}
-	i386-elf-gcc -T ./linker.ld -o isodir/boot/$@ -ffreestanding $^ -nostdlib 
+	${complier} -T ./linker.ld -o isodir/boot/$@ -ffreestanding $^ -nostdlib 
 
 
 #编译成目标文件
 %.o : %.c ${HEADERS}
-	i386-elf-gcc $(CFLAGS) -c $< -o $@
+	${complier} $(CFLAGS) -c $< -o $@
 
 %.o: %.asm
 	nasm $< -felf32 -o $@
