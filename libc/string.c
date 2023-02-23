@@ -35,6 +35,14 @@ int strcmp(const char *s1, const char *s2){
     }
     return s1[i] - s2[i];
 }
+char* strcpy(char* dst, char *src){
+    int i = 0;
+    for(;src[i] != '\0'; ++i){
+        dst[i] = src[i];
+    }
+    dst[i] = '\0';
+    return dst;
+}
 
 void append(char *str, char c){
     int n = strlen(str);

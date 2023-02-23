@@ -2,9 +2,11 @@
 #define STRING_H_
 #include <stdint.h>
 
+
 void int_to_ascii(int n, char *buf);
 void reverse(char *str);
 int  strlen(const char *str);
+char* strcpy(char *dst, char *src);
 int  strcmp(const char *s1, const char *s2);
 void append(char *str, char c);
 void backspace(char *buf);

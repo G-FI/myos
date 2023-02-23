@@ -41,7 +41,7 @@ void initialize_paging(){
     }
 
      for(uint32_t i = KHEAP_START; i < KHEAP_START + KHEAP_INITIAL_SIZE; i += FRAMESZ)
-        alloc_frame(get_pte(i, 1, kernel_dir), 0, 1);
+        alloc_frame(get_pte(i, 1, kernel_dir), 0, 0);
 
     registe_interrupt_handler(14, page_fault);
 

@@ -8,9 +8,18 @@
 #include "../libc/printf.h"
 #include "vmm.h"
 #include "../libc/function.h"
+
+#include "multiboot.h"
+#include "initrd.h"
+#include "fs.h"
+
+extern uint32_t placement_address;
+
 //test
+/*
 #include "kheap.h"
 #include "ordered_array.h"
+
 
 extern heap_t* kheap;
 
@@ -32,21 +41,51 @@ void test_heap_alloc(){
    char* ptr3 = (char*)alloc(1234, 1, kheap);
    char* ptr4 = (char*)alloc(0x100000, 0, kheap);
 }
-
 header_t *get_header(uint32_t p){
     return p-sizeof(header_t);
 }
+*/
+
+void initrd_test(fs_node_t* fs_root){
+    int i = 0;
+    struct dirent *node = 0;
+    while ( (node = readdir_fs(fs_root, i)) != 0)
+    {
+    printf("Found file");
+    printf(node->name);
+    fs_node_t *fsnode = finddir_fs(fs_root, node->name);
+
+    if ((fsnode->flags&0x7) == FS_DIRECTORY)
+        printf("\n         (directory)\n");
+    else
+    {
+        printf("\n         contents:");
+        char buf[256];
+        uint32_t sz = read_fs(fsnode, 0, 256, buf);
+
+        printf("\"%s\"\n", buf);
+    }
+    i++;
+    }
+}
 
 
-void kernel_main(){
+void kernel_main(struct multiboot* mboot_ptr){
     init_descriptor_tables();
+
+    ASSERT(mboot_ptr->mods_count > 0);
+    uint32_t initrd_location = *((uint32_t*)mboot_ptr->mods_addr);
+    uint32_t initrd_end = *(uint32_t*)(mboot_ptr->mods_addr+4);
+    placement_address = initrd_end;
 
     asm volatile ("sti");
     init_timer(500);
     init_keyboard();
     initialize_paging();
-    
 
+    fs_root = initialise_initrd(initrd_location);
+
+   
     while(1);
 }
 

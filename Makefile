@@ -8,18 +8,21 @@ CFLAGS = -g -std=gnu99 -ffreestanding -Wall -Wextra
 
 complier=i686-elf-gcc
 
-##直接从内核文件启动，而不需要启动介质cdrom
-run: myos.elf
-	qemu-system-i386 -kernel isodir/boot/$<
-
-debug: myos.elf
-	qemu-system-i386 -S -s -kernel isodir/boot/$<
-
-
-
 myos.elf:linker.ld  ${OBJ}
 	${complier} -T ./linker.ld -o isodir/boot/$@ -ffreestanding $^ -nostdlib 
 
+
+##添加ramdisk之后，使用tutorial 提供的floopy.img 因此从软盘启动
+run: myos.elf makefloppy
+	qemu-system-i386 -fda ./floppy.img
+	#qemu-system-i386 -kernel isodir/boot/$<
+
+debug: myos.elf makefloppy
+	qemu-system-i386 -S -s -fda ./floppy.img
+	#qemu-system-i386 -S -s -kernel isodir/boot/$<
+
+makefloppy:
+	/bin/bash ./update_image.sh
 
 #编译成目标文件
 %.o : %.c ${HEADERS}
@@ -32,4 +35,3 @@ myos.elf:linker.ld  ${OBJ}
 clean:
 	rm -rf  boot/*.o cpu/*.o drivers/*.o kernel/*.o libc/*.o
 	rm isodir/boot/*.elf
-	rm *.iso

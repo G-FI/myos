@@ -18,7 +18,10 @@
         "iomanip": "c",
         "istream": "c",
         "functional": "c",
-        "utility": "c"
+        "utility": "c",
+        "initrd.h": "c",
+        "multiboot.h": "c",
+        "fs.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }
