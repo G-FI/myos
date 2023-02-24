@@ -49,12 +49,12 @@ static uint32_t kheap_aux(uint32_t sz, int aligned, uint32_t *pa){
         return start_addr;
     }else{
     //heap can be used
-        uint32_t ret = (uint32_t)alloc(sz, aligned, kheap);
+        uint32_t va = (uint32_t)alloc(sz, aligned, kheap);
         if(pa){
-            pte_t *pte = get_pte(pa, 0, kernel_dir);
-            *pa = pte->frame << 12 + (ret & 0xFFF);
+            pte_t *pte = get_pte(va, 0, kernel_dir);
+            *pa = pte->frame << 12 + (va & 0xFFF);
         }
-        return ret;
+        return va;
     }
 }
 
@@ -132,7 +132,7 @@ void* alloc(uint32_t sz, int aligned, heap_t *heap){
         if(offset > sizeof(header_t) + sizeof(footer_t)){
             //header到对齐点之间有空间可以用，足够分成一个单独的hole
             create_hole((uint32_t)header, (uint32_t)new_header, kheap);
-        
+            insert(header, &kheap->headers_ptr);
         }else{
             //不够，就需要合并到前一个hole或者block（不管它是不是空闲，因为要保证堆区是全部连接的）
             header_t *pre_header = PREHEADER(header);
@@ -166,6 +166,8 @@ void* alloc(uint32_t sz, int aligned, heap_t *heap){
         uint32_t start = (uint32_t)header + sizeof(header_t) + sz +sizeof(footer_t);
         uint32_t end = (uint32_t)header + header->size;
         create_hole(start, end, kheap);
+        insert((header_t*)start, &kheap->headers_ptr);
+        
         header->size = header->size - (end - start);
         //size of header changed, so we need to set a new footer
         footer = FOOTER(header);
@@ -182,7 +184,9 @@ void* alloc(uint32_t sz, int aligned, heap_t *heap){
 void* free(void *p, heap_t *heap){
     header_t *header = (header_t*)(p - sizeof(header_t));
     ASSERT(header->magic =  MAGIC);
+    header->is_hole = 1;
     contract(header, heap);
+   //extract()
 }
 
 //return the index of smallest  hole fitted
@@ -229,6 +233,7 @@ void expand(uint32_t newsz, heap_t *heap){
     }
     heap->end_addr = new_end;
     create_hole(old_end, new_end, kheap);
+    //old_end作为新添加的hole的header
     contract((header_t*)old_end, heap);
 }
 
@@ -258,7 +263,6 @@ void create_hole(uint32_t start_addr, uint32_t end_addr, heap_t *heap){
     footer_t *footer = (footer_t*)(end_addr - sizeof(footer_t));
     footer->magic = MAGIC;
     footer->header = header;
-    insert(header, heap);
 }
 
 //unify left or right, if it is a hole 
@@ -302,8 +306,8 @@ void contract(header_t *h, heap_t *heap){
         }
     }
 
-    //对于只合并右边的情况
-    uint32_t idx = find(h, &heap->headers_ptr);
-    increase_key(idx, &heap->headers_ptr);
-    
+    //对于只合并右边的情况,或者不合并时将新的hole插入头部数组中
+    insert(h, &kheap->headers_ptr);
+    // uint32_t idx = find(h, &heap->headers_ptr);
+    // increase_key(idx, &heap->headers_ptr);  
 }

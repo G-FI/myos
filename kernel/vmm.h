@@ -32,6 +32,7 @@ typedef struct{
     //当clonetable时用的上
     uint32_t table_physical[ENTRIES];
 
+    //保存当前表的起始物理地址=physicaladdr(pagetable_dir) + offset(table_physical)
     uint32_t physical_addr;
 
 }pagetable_dir_t;
@@ -46,6 +47,8 @@ void switch_page_dir(pagetable_dir_t *new_dir);
 pte_t *get_pte(uint32_t pa, int make, pagetable_dir_t *dir);
 
 void page_fault(registers_t regs);
+
+pagetable_dir_t* clone_directory(pagetable_dir_t* src);
 
 
 

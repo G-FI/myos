@@ -2,7 +2,7 @@
 C_SOURCES = ${wildcard kernel/*.c libc/*.c drivers/*.c cpu/*.c}
 HEADERS = ${wildcard kernel/*.h drivers/*.h cpu/*.h libc/*.h}
 #变量值替换（var: .c = .o）
-OBJ = ${C_SOURCES:.c=.o boot/boot.o cpu/interrupt.o cpu/tables_flush.o}
+OBJ = ${C_SOURCES:.c=.o boot/boot.o cpu/interrupt.o cpu/tables_flush.o kernel/process.o}
 
 CFLAGS = -g -std=gnu99 -ffreestanding -Wall -Wextra
 

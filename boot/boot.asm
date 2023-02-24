@@ -55,6 +55,7 @@ _start:
 	; in assembly as languages such as C cannot function without a stack.
 	;mov esp, stack_top
 	;multiboot 
+	push 	esp ;启动时栈的位置
 	push    ebx
 	; This is a good place to initialize crucial processor state before the
 	; high-level kernel is entered. It's best to minimize the early

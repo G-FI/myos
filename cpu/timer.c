@@ -5,11 +5,14 @@
 #include "../libc/printf.h"
 #include "../libc/function.h"
 
+#include "../kernel/task.h"
+
 uint32_t ticks = 0;
 
 void timer_callback(registers_t regs){
     ++ticks;
-    UNUSED(regs);
+
+    switch_task();
     //printf("ticks: %d\n", ticks);
     
 }

@@ -12,8 +12,10 @@
 #include "multiboot.h"
 #include "initrd.h"
 #include "fs.h"
+#include "task.h"
 
 extern uint32_t placement_address;
+uint32_t initial_esp; //起动栈的位置
 
 //test
 /*
@@ -70,7 +72,9 @@ void initrd_test(fs_node_t* fs_root){
 }
 
 
-void kernel_main(struct multiboot* mboot_ptr){
+void kernel_main(struct multiboot* mboot_ptr, uint32_t initial_stack){
+
+    initial_esp = initial_stack;
     init_descriptor_tables();
 
     ASSERT(mboot_ptr->mods_count > 0);
@@ -79,13 +83,17 @@ void kernel_main(struct multiboot* mboot_ptr){
     placement_address = initrd_end;
 
     asm volatile ("sti");
-    init_timer(500);
     init_keyboard();
     initialize_paging();
 
     fs_root = initialise_initrd(initrd_location);
+    initialise_tasking();
+    init_timer(100000000);
 
-   
+    int ret =fork();
+    printf("fork() returned %d, getpid() returned %d", ret, getpid());
+
+
     while(1);
 }
 

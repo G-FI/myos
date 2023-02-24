@@ -21,7 +21,11 @@
         "utility": "c",
         "initrd.h": "c",
         "multiboot.h": "c",
-        "fs.h": "c"
+        "fs.h": "c",
+        "deque": "c",
+        "string": "c",
+        "vector": "c",
+        "ostream": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }
