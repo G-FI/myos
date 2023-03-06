@@ -33,3 +33,5 @@ Bit 4
 # Multitasking 
 fork之后子进程在开始被调度时，栈有问题，返回地址不对，跳转到错误地址导致 present错误，说明从父进程复制栈的时候有问题，说明clone_table有问题
 
+Jimix
+JamesM's Tutorial

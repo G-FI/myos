@@ -25,7 +25,8 @@
         "deque": "c",
         "string": "c",
         "vector": "c",
-        "ostream": "c"
+        "ostream": "c",
+        "task.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }

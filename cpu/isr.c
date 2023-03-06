@@ -6,7 +6,7 @@
 
 isr_t interrupt_handlers[256];
 
-//public API to set hardware interrupt
+
 void registe_interrupt_handler(uint8_t n, isr_t handler){
     interrupt_handlers[n] = handler;
 }

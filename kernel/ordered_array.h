@@ -6,6 +6,7 @@
 #include <stdint.h>
 
 typedef void* type_t; //ordered array store address of other data struct
+
 typedef (*less_than_predicate)(void*, void*);
 
 typedef struct{

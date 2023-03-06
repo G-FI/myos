@@ -12,7 +12,7 @@ typedef struct
 typedef struct
 {
    uint8_t magic;     
-   char name[64];  //文件名
+   char name[64];  
    uint32_t offset;   // ramdisk该文件起始的位置
    uint32_t length;   //文件长度
 } initrd_file_header_t;

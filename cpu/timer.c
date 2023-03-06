@@ -11,7 +11,9 @@ uint32_t ticks = 0;
 
 void timer_callback(registers_t regs){
     ++ticks;
-
+    // if(ticks % 1000 == 0){
+    //     printf("ticks: %d\n", ticks);
+    // }
     switch_task();
     //printf("ticks: %d\n", ticks);
     

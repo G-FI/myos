@@ -14,7 +14,7 @@ int handle_screen(int offset);
 int kprint_char(char c, int row, int col, char attr);
 
 
-/*public API*/
+/*screen API*/
 void clear_screen(){
     int row;
     int col;

@@ -46,8 +46,5 @@ void* alloc(uint32_t sz, int aligned, heap_t *heap);
 void* free(void *p, heap_t *heap);
 
 
-int find_smallest_hole(uint32_t sz, int aligned, heap_t *heap);
-void expand(uint32_t newsz, heap_t *heap);
-void extract(uint32_t newsz, heap_t *heap);
-void create_hole(uint32_t start_addr, uint32_t end_addr, heap_t *heap);
+
 #endif //KHEAP_H_

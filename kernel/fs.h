@@ -44,7 +44,7 @@ typedef struct{
 }fs_node_t;
 
 struct dirent{
-    char name[128];     //文件名
+    char name[128];   
     uint32_t ino;       //innode number
 };
 

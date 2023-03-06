@@ -3,7 +3,6 @@
 #include "kheap.h"
 #include "../libc/string.h"
 #include "../libc/printf.h"
-#include "fork.h"
 
 extern uint32_t *frames;
 extern uint32_t nframes;
@@ -64,7 +63,7 @@ void initialize_paging(){
 }
 
 void switch_page_dir(pagetable_dir_t *new_dir){
-    //cr3 store the address of talbe pointer?
+    //cr3 store the address of talbe pointer
     asm volatile("mov %0, %%cr3"::"r"(new_dir->physical_addr)); 
     uint32_t cr0;
     asm volatile("mov %%cr0, %0":"=r"(cr0));    

@@ -53,18 +53,18 @@ void initrd_test(fs_node_t* fs_root){
     struct dirent *node = 0;
     while ( (node = readdir_fs(fs_root, i)) != 0)
     {
-    printf("Found file");
+    printf("Found file:");
     printf(node->name);
     fs_node_t *fsnode = finddir_fs(fs_root, node->name);
 
     if ((fsnode->flags&0x7) == FS_DIRECTORY)
-        printf("\n         (directory)\n");
+        printf("            (directory)\n");
     else
     {
-        printf("\n         contents:");
+        printf("              contents:");
         char buf[256];
         uint32_t sz = read_fs(fsnode, 0, 256, buf);
-
+        buf[39] = '\0';
         printf("\"%s\"\n", buf);
     }
     i++;
@@ -87,13 +87,16 @@ void kernel_main(struct multiboot* mboot_ptr, uint32_t initial_stack){
     initialize_paging();
 
     fs_root = initialise_initrd(initrd_location);
+
+    initrd_test(fs_root);
+
     initialise_tasking();
     init_timer(100000000);
 
-    int ret =fork();
-    printf("fork() returned %d, getpid() returned %d", ret, getpid());
+    int ret = fork(); 
+    printf("the forked process id is %d\n", ret);
 
-
+    
     while(1);
 }
 

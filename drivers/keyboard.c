@@ -17,6 +17,8 @@ const char *sc_name[] = { "ERROR", "Esc", "1", "2", "3", "4", "5", "6",
         "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "`", 
         "LShift", "\\", "Z", "X", "C", "V", "B", "N", "M", ",", ".", 
         "/", "RShift", "Keypad *", "LAlt", "Spacebar"};
+
+        
 const char sc_ascii[] = { '?', '?', '1', '2', '3', '4', '5', '6',     
     '7', '8', '9', '0', '-', '=', '?', '?', 'Q', 'W', 'E', 'R', 'T', 'Y', 
         'U', 'I', 'O', 'P', '[', ']', '?', '?', 'A', 'S', 'D', 'F', 'G', 
@@ -42,7 +44,7 @@ void kerboard_callback(){
         char str[2] = {c, 0};
         kprint(str); 
         //add to input buf
-        append(input_buf, c);
+        //append(input_buf, c);
     }
 }
 
