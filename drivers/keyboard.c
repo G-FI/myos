@@ -4,12 +4,16 @@
 #include "../cpu/isr.h"
 #include "../libc/string.h"
 #include "../kernel/kernel.h"
+#include "../kernel/fs.h"
 
 #define BACKSPACE 0x0E
 #define ENTER 0x1C
 #define SC_MAX 57
 
 char input_buf[256];
+
+extern fs_node_t *initrd_root;
+extern void initrd_test(fs_node_t* fs_root);
 
 const char *sc_name[] = { "ERROR", "Esc", "1", "2", "3", "4", "5", "6", 
     "7", "8", "9", "0", "-", "=", "Backspace", "Tab", "Q", "W", "E", 
@@ -38,13 +42,17 @@ void kerboard_callback(){
         // }
     }else if(scancode == ENTER){
         kprint("\n");
+        if(input_buf[0] == 'R'){
+            initrd_test(initrd_root);
+        }
+
         input_buf[0] = 0;
     }else{
         char c = sc_ascii[scancode];
         char str[2] = {c, 0};
         kprint(str); 
         //add to input buf
-        //append(input_buf, c);
+        append(input_buf, c);
     }
 }
 
