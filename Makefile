@@ -15,6 +15,7 @@ myos.elf:linker.ld  ${OBJ}
 ##添加ramdisk之后，使用tutorial 提供的floopy.img 因此从软盘启动
 run: myos.elf makefloppy
 	qemu-system-i386 -fda ./floppy.img
+	
 	#qemu-system-i386 -kernel isodir/boot/$<
 
 debug: myos.elf makefloppy
